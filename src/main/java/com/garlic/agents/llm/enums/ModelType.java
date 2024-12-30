@@ -4,7 +4,6 @@ package com.garlic.agents.llm.enums;
  * model type
  *
  * @author MoChenYa
- * @date 2024/12/27
  * @since 1.0
  */
 public enum ModelType {
@@ -14,7 +13,7 @@ public enum ModelType {
     OPENAI("openai"),
     ;
 
-    private String name;
+    private final String name;
 
     ModelType(String name) {
         this.name = name;

@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
  * http request util
  *
  * @author MoChenYa
- * @date 2024/12/27
  * @since 1.0
  */
 public class HttpUtil {

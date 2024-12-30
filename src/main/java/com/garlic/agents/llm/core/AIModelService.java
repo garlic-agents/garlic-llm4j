@@ -1,24 +1,24 @@
 package com.garlic.agents.llm.core;
 
+import cn.hutool.core.util.ObjUtil;
 import com.garlic.agents.llm.enums.ModelType;
 import com.garlic.agents.llm.exception.AIModelException;
 import com.garlic.agents.llm.providers.gemini.GeminiProcessor;
 import com.garlic.agents.llm.providers.openai.OpenAIProcessor;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * AI model service.
  *
  * @author MoChenYa
- * @date 2024/12/27
  * @since 1.0
  */
 public class AIModelService {
 
     private static volatile AIModelService instance;
-    private final Map<ModelType, ModelProcessor> processors = new HashMap<>();
+    private final Map<ModelType, ModelProcessor> processors = new ConcurrentHashMap<>();
     private ModelConfig config;
 
     private AIModelService() {
@@ -39,16 +39,13 @@ public class AIModelService {
         this.config = config;
     }
 
-    private ModelProcessor getProcessor(ModelType type) {
-        return processors.computeIfAbsent(type, t -> {
-            switch (t) {
-                case OPENAI:
-                    return new OpenAIProcessor(config);
-                case GEMINI:
-                    return new GeminiProcessor(config);
-                default:
-                    throw new AIModelException("Unsupported model type: " + t);
-            }
+    public ModelProcessor getProcessor(ModelType type) {
+        if (ObjUtil.isNull(type)) {
+            throw new AIModelException("Model type is null");
+        }
+        return processors.computeIfAbsent(type, t -> switch (t) {
+            case OPENAI -> new OpenAIProcessor(config);
+            case GEMINI -> new GeminiProcessor(config);
         });
     }
 }
