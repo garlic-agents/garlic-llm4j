@@ -4,6 +4,7 @@ import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +30,16 @@ public class HttpUtil {
     public static Response request(String url) {
         OkHttpClient client = getClient();
         Call call = client.newCall(new Request.Builder().url(url).build());
+        try {
+            return call.execute();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Response request(@NotNull Request request) {
+        OkHttpClient client = getClient();
+        Call call = client.newCall(request);
         try {
             return call.execute();
         } catch (Exception e) {
