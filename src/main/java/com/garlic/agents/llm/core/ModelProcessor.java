@@ -2,6 +2,7 @@ package com.garlic.agents.llm.core;
 
 import com.garlic.agents.llm.domain.ModelRequest;
 import com.garlic.agents.llm.domain.ModelResponse;
+import com.garlic.agents.llm.domain.response.StreamCallback;
 
 /**
  * ModelProcessor
@@ -13,4 +14,5 @@ public interface ModelProcessor {
 
     ModelResponse process(ModelRequest request);
 
+    void streamProcess(ModelRequest request, StreamCallback callback);
 }

@@ -1,10 +1,12 @@
 package com.garlic.agents.llm.core;
 
 import cn.hutool.core.util.ObjUtil;
-import com.garlic.agents.llm.enums.ModelType;
+import com.garlic.agents.llm.enums.ProcessorType;
 import com.garlic.agents.llm.exception.AIModelException;
-import com.garlic.agents.llm.providers.gemini.GeminiProcessor;
-import com.garlic.agents.llm.providers.openai.OpenAIProcessor;
+import com.garlic.agents.llm.processors.gemini.GeminiProcessor;
+import com.garlic.agents.llm.processors.openai.OpenAIProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,11 +19,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class AIModelService {
 
+    public static final Logger logger = LoggerFactory.getLogger(AIModelService.class);
+
     private static volatile AIModelService instance;
-    private final Map<ModelType, ModelProcessor> processors = new ConcurrentHashMap<>();
+    private final Map<ProcessorType, ModelProcessor> processors = new ConcurrentHashMap<>();
     private ModelConfig config;
 
     private AIModelService() {
+    }
+
+    public static AIModelService getInstance(ModelConfig config) {
+        AIModelService instance = getInstance();
+        instance.init(config);
+        return instance;
     }
 
     public static AIModelService getInstance() {
@@ -39,7 +49,7 @@ public class AIModelService {
         this.config = config;
     }
 
-    public ModelProcessor getProcessor(ModelType type) {
+    public ModelProcessor getProcessor(ProcessorType type) {
         if (ObjUtil.isNull(type)) {
             throw new AIModelException("Model type is null");
         }

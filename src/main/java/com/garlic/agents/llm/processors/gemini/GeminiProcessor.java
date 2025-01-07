@@ -1,9 +1,10 @@
-package com.garlic.agents.llm.providers.gemini;
+package com.garlic.agents.llm.processors.gemini;
 
 import com.garlic.agents.llm.core.ModelConfig;
 import com.garlic.agents.llm.core.ModelProcessor;
 import com.garlic.agents.llm.domain.ModelRequest;
 import com.garlic.agents.llm.domain.ModelResponse;
+import com.garlic.agents.llm.domain.response.StreamCallback;
 
 /**
  * gemini processor
@@ -22,5 +23,10 @@ public class GeminiProcessor implements ModelProcessor {
     @Override
     public ModelResponse process(ModelRequest request) {
         return null;
+    }
+
+    @Override
+    public void streamProcess(ModelRequest request, StreamCallback callback) {
+
     }
 }

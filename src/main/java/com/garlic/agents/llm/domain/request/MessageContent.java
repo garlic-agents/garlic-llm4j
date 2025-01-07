@@ -1,4 +1,4 @@
-package com.garlic.agents.llm.domain;
+package com.garlic.agents.llm.domain.request;
 
 import com.garlic.agents.llm.domain.enums.MessageContentType;
 
@@ -25,10 +25,22 @@ public class MessageContent implements Serializable {
     public MessageContent() {
     }
 
+    public MessageContent(MessageContentType type, String text) {
+        this(type, text, null);
+    }
+
     public MessageContent(MessageContentType type, String text, String image) {
         this.type = type;
         this.text = text;
         this.image = image;
+    }
+
+    public static MessageContent text(String text) {
+        return new MessageContent(MessageContentType.TEXT, text);
+    }
+
+    public static MessageContent image(String image) {
+        return new MessageContent(MessageContentType.IMAGE, null, image);
     }
 
     public MessageContentType getType() {

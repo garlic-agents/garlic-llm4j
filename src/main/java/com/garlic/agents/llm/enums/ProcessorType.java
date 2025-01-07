@@ -6,11 +6,8 @@ package com.garlic.agents.llm.enums;
  * @author MoChenYa
  * @since 1.0
  */
-public enum ModelType {
+public enum ProcessorType {
 
-    CHAT,
-    IMAGE,
-    VIDEO,
-    AUDIO2TEXT,
-    TEXT2AUDIO,
+    GEMINI,
+    OPENAI,
 }

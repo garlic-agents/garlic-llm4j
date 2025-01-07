@@ -1,4 +1,4 @@
-package com.garlic.agents.llm.domain;
+package com.garlic.agents.llm.domain.request;
 
 import com.garlic.agents.llm.domain.enums.MessageRole;
 
@@ -27,6 +27,18 @@ public class ModelMessage implements Serializable {
     public ModelMessage(MessageRole role, List<MessageContent> content) {
         this.role = role;
         this.content = content;
+    }
+
+    public static ModelMessage user(List<MessageContent> content) {
+        return new ModelMessage(MessageRole.USER, content);
+    }
+
+    public static ModelMessage assistant(List<MessageContent> content) {
+        return new ModelMessage(MessageRole.ASSISTANT, content);
+    }
+
+    public static ModelMessage system(List<MessageContent> content) {
+        return new ModelMessage(MessageRole.SYSTEM, content);
     }
 
     public MessageRole getRole() {

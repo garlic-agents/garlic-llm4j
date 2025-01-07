@@ -1,5 +1,8 @@
 package com.garlic.agents.llm.domain;
 
+import com.garlic.agents.llm.domain.request.ModelMessage;
+import com.garlic.agents.llm.enums.ModelType;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
@@ -15,24 +18,31 @@ public class ModelRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String model;
+    private String modelName;
+
+    private ModelType modelType;
 
     private List<ModelMessage> messages;
 
     public ModelRequest() {
     }
 
-    public ModelRequest(String model, List<ModelMessage> messages) {
-        this.model = model;
+    public ModelRequest(String modelName, ModelType modelType, List<ModelMessage> messages) {
+        this.modelName = modelName;
+        this.modelType = modelType;
         this.messages = messages;
     }
 
-    public String getModel() {
-        return model;
+    public static ModelRequest chat(String modelName, List<ModelMessage> messages) {
+        return new ModelRequest(modelName, ModelType.CHAT, messages);
     }
 
-    public void setModel(String model) {
-        this.model = model;
+    public String getModelName() {
+        return modelName;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
     }
 
     public List<ModelMessage> getMessages() {
