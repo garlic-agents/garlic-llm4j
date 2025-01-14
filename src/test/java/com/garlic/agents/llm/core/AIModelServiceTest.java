@@ -102,4 +102,72 @@ public class AIModelServiceTest {
         Assertions.assertEquals(sb.toString(), resultSb.toString());
     }
 
+    @Test
+    @DisplayName("Test Openai Error Processor")
+    public void testOpenaiErrorProcessor() {
+        ModelConfig modelConfig = ModelConfig.builder()
+                .url(OPENAI_API_URL)
+                .apiKey("ERROR")
+                .build();
+        AIModelService service = AIModelService.getInstance(modelConfig);
+        ModelProcessor processor = service.getProcessor(ProcessorType.OPENAI);
+        Assertions.assertNotNull(processor);
+        String userMessage = "请返回内容“TEST”这四个字母，请不要返回其他任何内容。";
+        MessageContent messageContent = MessageContent.text(userMessage);
+        ModelMessage modelMessage = ModelMessage.user(List.of(messageContent));
+        ModelRequest request = ModelRequest.chat("gpt-3.5-turbo", List.of(modelMessage));
+        ModelResponse process = processor.process(request);
+        logger.info("process: {}", JSON.toJSONString(process));
+        Assertions.assertNotNull(process);
+        Assertions.assertEquals(ResponseStatus.SUCCESS, process.getStatus());
+        Assertions.assertNotNull(process.getContent());
+    }
+
+    @Test
+    @DisplayName("Test Openai Stream Error Processor")
+    public void testOpenaiStreamErrorProcessor() {
+        ModelConfig modelConfig = ModelConfig.builder()
+                .url(OPENAI_API_URL)
+                .apiKey("ERROR")
+                .build();
+        AIModelService service = AIModelService.getInstance(modelConfig);
+        ModelProcessor processor = service.getProcessor(ProcessorType.OPENAI);
+        Assertions.assertNotNull(processor);
+        String userMessage = "请返回1到50的阿拉伯数字，中间使用中文顿号“、”分割，请不要返回其他任何内容。";
+        MessageContent messageContent = MessageContent.text(userMessage);
+        ModelMessage modelMessage = ModelMessage.user(List.of(messageContent));
+        ModelRequest request = ModelRequest.chat("gpt-3.5-turbo", List.of(modelMessage));
+        StringBuilder resultSb = new StringBuilder();
+        AtomicBoolean endFlag = new AtomicBoolean(false);
+        processor.streamProcess(request, (modelResponse) -> {
+            logger.info("stream process callback => {}", JSON.toJSONString(modelResponse));
+            Assertions.assertNotEquals(ResponseStatus.FAILURE, modelResponse.getStatus());
+            if (modelResponse.getStatus() == ResponseStatus.END) {
+                endFlag.set(true);
+                return;
+            }
+            String content = modelResponse.getContent();
+            resultSb.append(StrUtil.isEmpty(content) ? "" : content);
+        });
+
+        // 等待异步处理完成
+        while (!endFlag.get()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                logger.error("Thread sleep error", e);
+            }
+        }
+
+        // 拼接一个返回字符串用于断言检测
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= 50; i++) {
+            sb.append(i);
+            if (i != 50) {
+                sb.append("、");
+            }
+        }
+        Assertions.assertEquals(sb.toString(), resultSb.toString());
+    }
+
 }
