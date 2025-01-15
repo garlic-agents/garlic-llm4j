@@ -61,11 +61,18 @@ public class OpenAIProcessor implements ModelProcessor {
             String string = httpResponse.body().string();
             logger.debug("response => {}", string);
             DocumentContext documentContext = JsonPath.parse(string);
-            String content = documentContext.read("$.choices[0].message.content", String.class);
+            String content = JsonUtil.safeRead(documentContext, "$.choices[0].message.content", String.class);
+            if (ObjUtil.isNull(content)) {
+                String error = JsonUtil.safeRead(documentContext, "$.error", String.class);
+                if (StrUtil.isNotBlank(error)) {
+                    return new ModelResponse(ResponseStatus.FAILURE, error);
+                }
+                return new ModelResponse(ResponseStatus.FAILURE, string);
+            }
             ModelUsage modelUsage = new ModelUsage.Builder()
-                    .promptTokens(documentContext.read("$.usage.prompt_tokens", Long.class))
-                    .completionTokens(documentContext.read("$.usage.prompt_tokens", Long.class))
-                    .totalTokens(documentContext.read("$.usage.total_tokens", Long.class))
+                    .promptTokens(JsonUtil.safeRead(documentContext, "$.usage.prompt_tokens", Long.class))
+                    .completionTokens(JsonUtil.safeRead(documentContext, "$.usage.prompt_tokens", Long.class))
+                    .totalTokens(JsonUtil.safeRead(documentContext, "$.usage.total_tokens", Long.class))
                     .build();
             return new ModelResponse.Builder()
                     .status(ResponseStatus.SUCCESS)

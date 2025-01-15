@@ -58,4 +58,8 @@ public class AIModelService {
             case GEMINI -> new GeminiProcessor(config);
         });
     }
+
+    public void clearProcessors() {
+        processors.clear();
+    }
 }

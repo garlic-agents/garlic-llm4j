@@ -76,10 +76,16 @@ public class HttpUtil {
 
                 @Override
                 public void onFailure(@NotNull EventSource eventSource, @Nullable Throwable t, @Nullable Response response) {
-                    logger.error("streamRequest EventSourceListener.onFailure", t);
+                    if (ObjUtil.isNotNull(response) && ObjUtil.isNotNull(response.body())) {
+                        try {
+                            logger.error("stream request onFailure response => {}", response.body().string());
+                        } catch (Exception ignore) {
+                        }
+                    }
+                    logger.error("stream request onFailure throwable => ", t);
                     HttpSseResponse sseResponse = new HttpSseResponse.Builder()
                             .status(ResponseStatus.FAILURE)
-                            .data(ObjUtil.isNull(t) ? "streamRequest failed" : t.getMessage())
+                            .data(ObjUtil.isNull(t) ? "stream request failed" : t.getMessage())
                             .build();
                     callback.accept(sseResponse);
                     eventLatch.countDown();
@@ -87,7 +93,7 @@ public class HttpUtil {
 
                 @Override
                 public void onClosed(@NotNull EventSource eventSource) {
-                    logger.info("streamRequest closed");
+                    logger.info("stream request closed");
                     eventLatch.countDown();
                     callback.accept(HttpSseResponse.CLOSED);
                 }
@@ -95,7 +101,7 @@ public class HttpUtil {
             realEventSource.connect(client);
             eventLatch.await();
         } catch (Exception exception) {
-            logger.error("streamRequest failed", exception);
+            logger.error("stream request failed", exception);
             HttpSseResponse sseResponse = new HttpSseResponse.Builder()
                     .status(ResponseStatus.FAILURE)
                     .data(exception.getMessage())
